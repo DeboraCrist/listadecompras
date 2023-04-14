@@ -1,4 +1,4 @@
-# imc
+# lista de compras
 
 A new Flutter project.
 
