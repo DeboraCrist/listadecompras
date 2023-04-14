@@ -1,0 +1,4 @@
+#Wed Apr 12 23:53:05 BRT 2023
+base.0=/home/debora/Documentos/dart/listadecompras/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
+renamed.0=classes.dex
+path.0=classes.dex
