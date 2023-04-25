@@ -1,76 +1,125 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-void main() => runApp(const ListaDeCompras());
+void main() {
+  runApp(const ProviderScope(child: MyApp()));
+}
 
-class ListaDeCompras extends StatelessWidget {
-  const ListaDeCompras({Key? key}) : super(key: key);
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Lista de Compras',
-      home: ListaDeComprasPage(),
+    return MaterialApp(
+      theme: ThemeData(
+        primarySwatch: Colors.red,
+      ),
+      home: const MyHomePage(),
     );
   }
 }
 
-class ListaDeComprasPage extends StatefulWidget {
-  const ListaDeComprasPage({Key? key}) : super(key: key);
+final listaDeComprasProvider =
+    StateNotifierProvider<ListaDeComprasNotifier, List<String>>((ref) {
+  return ListaDeComprasNotifier();
+});
 
-  @override
-  _ListaDeComprasPageState createState() => _ListaDeComprasPageState();
+class ListaDeComprasNotifier extends StateNotifier<List<String>> {
+  ListaDeComprasNotifier() : super([]);
+
+  void adicionarItem(String item) {
+    state = [...state, item];
+  }
+
+  void removerItem(String item) {
+    state = [...state.where((element) => element != item)];
+  }
+
+  void atualizarItem(String item, String novoItem) {
+    final novaLista = <String>[];
+    for (var i = 0; i < state.length; i++) {
+      if (state[i] == item) {
+        novaLista.add(novoItem);
+      } else {
+        novaLista.add(state[i]);
+      }
+    }
+    state = novaLista;
+  }
 }
 
-class _ListaDeComprasPageState extends State<ListaDeComprasPage> {
-  final List<String> _compras = [];
-
-  void _adicionarCompra(String compra) {
-    setState(() {
-      _compras.add(compra);
-    });
-  }
-
-  void _removerCompra(String compra) {
-    setState(() {
-      _compras.remove(compra);
-    });
-  }
+class MyHomePage extends ConsumerWidget {
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final listaDeCompras = ref.watch(listaDeComprasProvider);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lista de Compras'),
+        title: const Text('Lista de compras'),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: _compras.length,
-              itemBuilder: (context, index) {
-                final compra = _compras[index];
-                return ListTile(
-                  title: Text(compra),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () => _removerCompra(compra),
-                  ),
-                );
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              decoration: const InputDecoration(
-                labelText: 'Nova Compra',
+      body: Center(
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: listaDeCompras.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    title: Text(listaDeCompras[index]),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () {
+                        ref
+                            .read(listaDeComprasProvider.notifier)
+                            .removerItem(listaDeCompras[index]);
+                      },
+                    ),
+                    onLongPress: () async {
+                      final novoItem = await showDialog<String>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Editar item'),
+                            content: TextField(
+                              autofocus: true,
+                              decoration: const InputDecoration(
+                                  labelText: 'Novo nome do item'),
+                              onSubmitted: (String value) {
+                                Navigator.of(context).pop(value);
+                              },
+                            ),
+                          );
+                        },
+                      );
+                      if (novoItem != null) {
+                        ref
+                            .read(listaDeComprasProvider.notifier)
+                            .atualizarItem(listaDeCompras[index], novoItem);
+                      }
+                    },
+                  );
+                },
               ),
-              onSubmitted: (compra) {
-                _adicionarCompra(compra);
-              },
             ),
-          ),
-        ],
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                onSubmitted: (String value) {
+                  ref
+                      .read(listaDeComprasProvider.notifier)
+                      .adicionarItem(value);
+                },
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Adicionar item',
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
