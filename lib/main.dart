@@ -14,7 +14,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.red,
       ),
-      home: const MyHomePage(),
+      home: const MyHomePage(
+        title: '',
+      ),
     );
   }
 }
@@ -48,8 +50,34 @@ class ListaDeComprasNotifier extends StateNotifier<List<String>> {
   }
 }
 
+class ListaDeVendasNotifier extends StateNotifier<List<String>> {
+  ListaDeVendasNotifier() : super([]);
+
+  void adicionarItem(String item) {
+    state = [...state, item];
+  }
+
+  void removerItem(String item) {
+    state = [...state.where((element) => element != item)];
+  }
+
+  void atualizarItem(String item, String novoItem) {
+    final novaLista = <String>[];
+    for (var i = 0; i < state.length; i++) {
+      if (state[i] == item) {
+        novaLista.add(novoItem);
+      } else {
+        novaLista.add(state[i]);
+      }
+    }
+    state = novaLista;
+  }
+}
+
 class MyHomePage extends ConsumerWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
+
+  final String title;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -57,7 +85,7 @@ class MyHomePage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lista de compras'),
+        title: Text(title),
       ),
       body: Center(
         child: Column(
@@ -145,6 +173,27 @@ class MyHomePage extends ConsumerWidget {
             label: 'balanço',
           ),
         ],
+        onTap: (int index) {
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MyHomePage(
+                  title: 'Compras',
+                ),
+              ),
+            );
+          } else if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MyHomePage(
+                  title: 'Vendas',
+                ),
+              ),
+            );
+          }
+        },
       ),
     );
   }
