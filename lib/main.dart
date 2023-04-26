@@ -68,37 +68,46 @@ class MyHomePage extends ConsumerWidget {
                 itemBuilder: (BuildContext context, int index) {
                   return ListTile(
                     title: Text(listaDeCompras[index]),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () {
-                        ref
-                            .read(listaDeComprasProvider.notifier)
-                            .removerItem(listaDeCompras[index]);
-                      },
-                    ),
-                    onLongPress: () async {
-                      final novoItem = await showDialog<String>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('Editar item'),
-                            content: TextField(
-                              autofocus: true,
-                              decoration: const InputDecoration(
-                                  labelText: 'Novo nome do item'),
-                              onSubmitted: (String value) {
-                                Navigator.of(context).pop(value);
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () {
+                            ref
+                                .read(listaDeComprasProvider.notifier)
+                                .removerItem(listaDeCompras[index]);
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: () async {
+                            final novoItem = await showDialog<String>(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Editar item'),
+                                  content: TextField(
+                                    autofocus: true,
+                                    decoration: const InputDecoration(
+                                        labelText: 'Novo nome do item'),
+                                    onSubmitted: (String value) {
+                                      Navigator.of(context).pop(value);
+                                    },
+                                  ),
+                                );
                               },
-                            ),
-                          );
-                        },
-                      );
-                      if (novoItem != null) {
-                        ref
-                            .read(listaDeComprasProvider.notifier)
-                            .atualizarItem(listaDeCompras[index], novoItem);
-                      }
-                    },
+                            );
+                            if (novoItem != null) {
+                              ref
+                                  .read(listaDeComprasProvider.notifier)
+                                  .atualizarItem(
+                                      listaDeCompras[index], novoItem);
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                   );
                 },
               ),
