@@ -43,6 +43,7 @@ dependencies:
   path_provider: ^2.0.14
   flutter_riverpod: ^2.3.4
   provider: ^6.0.5
+  flutter_form_builder: ^8.0.0
 
 dev_dependencies:
   flutter_test:

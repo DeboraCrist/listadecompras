@@ -130,6 +130,18 @@ class MyHomePage extends ConsumerWidget {
           ],
         ),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'compras',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'vendas',
+          ),
+        ],
+      ),
     );
   }
 }
